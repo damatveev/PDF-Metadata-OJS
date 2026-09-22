@@ -1,0 +1,16 @@
+.pdfmd-panel { margin-block: 1.5rem; padding: 1.25rem; border: 1px solid #c5cdd7; border-radius: .4rem; background: #fff; color: #24334b; }
+.pdfmd-panel h2 { font-size: 1.2rem; font-weight: 700; }
+.pdfmd-panel h3 { margin-top: 1.5rem; font-weight: 700; }
+.pdfmd-panel p { margin-block: .65rem; }
+.pdfmd-field { min-width: 0; margin-block: 1rem; padding: 1rem; border: 1px solid #c5cdd7; border-radius: .3rem; }
+.pdfmd-field legend { padding-inline: .4rem; font-weight: 700; }
+.pdfmd-controls, .pdfmd-compare { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); align-items: start; }
+.pdfmd-input { display: flex; flex-direction: column; gap: .35rem; min-width: 0; }
+.pdfmd-input input, .pdfmd-input select, .pdfmd-input textarea { box-sizing: border-box; width: 100%; border: 1px solid #8191a8; border-radius: .25rem; padding: .55rem; background: #fff; color: #182c46; font: inherit; }
+.pdfmd-panel pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 22rem; overflow: auto; font: inherit; padding: .5rem; background: #f4f6f9; }
+.pdfmd-button { border: 1px solid #225aa0; background: #225aa0; color: white; padding: .55rem .85rem; border-radius: .3rem; cursor: pointer; margin-block: .4rem; }
+.pdfmd-button:disabled { opacity: .55; cursor: default; }
+.pdfmd-panel :focus-visible { outline: 3px solid #207aca; outline-offset: 3px; }
+.pdfmd-notice, .pdfmd-status { border-inline-start: 4px solid #9a6500; padding: .75rem; background: #fff8df; }
+.pdfmd-suggestion { padding: .3rem .7rem; background: #eef3f8; }
+.pdfmd-actions { margin-top: 1rem; }
