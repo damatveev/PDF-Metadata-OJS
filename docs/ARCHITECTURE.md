@@ -1,67 +1,132 @@
 # Архитектура и API
 
+## Назначение
+
+В 1.0.1 существуют два независимых сценария.
+
+### 1. Standalone issue workspace
+
+Основной сценарий. Редактор загружает полный PDF выпуска отдельно от Submission, размечает статьи по диапазонам страниц и сохраняет проверяемые черновики в структуре, близкой к OJS 3.5.
+
+Workspace **не создаёт submission и не пишет publication metadata в БД OJS**.
+
+### 2. Existing submission metadata
+
+Совместимый режим ранней версии: извлечение из исходного PDF существующего submission и применение явно выбранных полей после проверки ticket/fingerprint.
+
 ## Регистрация
 
-`PdfMetadataPlugin` наследует `PKP\plugins\GenericPlugin`. Класс загружается штатным PSR-4 пространством `APP\plugins\generic\pdfMetadata`. `version.xml` соответствует `pluginVersion.dtd`, `index.php` возвращает экземпляр плагина.
+`PdfMetadataPlugin` — `PKP\plugins\GenericPlugin`.
 
-- `APIHandler::endpoints::plugin` → `APIRouter::registerPluginApiControllers([new MetadataController()])`.
-- `TemplateManager::display` → JavaScript/CSS с контекстом `backend`. `pkpApp` загружается с приоритетом `STYLE_SEQUENCE_LATE`, затем конфигурация (`+1`) и JS плагина (`+2`). `addJavaScript` в проверенной версии не поддерживает `dependsOn`; порядок задаётся именно priority.
-- `pkp.registry.registerComponent('PdfMetadataPanel', component)`.
-- `pkp.registry.storeExtend('workflow', ...)` → `getPrimaryItems`: панель в разделе `primaryMenuItem=publication`, с фактическими ID выбранного submission/publication.
+Используются:
 
-DOM OJS не переписывается. Старые Smarty hooks workflow из OJS 3.3 не используются. Регистрация отключается для версий вне 3.5.x.
+- `APIHandler::endpoints::plugin` для API controller;
+- `TemplateManager::display` для backend JS/CSS;
+- OJS context, roles, sections и author user groups через штатные repositories/models.
 
-## Routes
+Плагин не хардкодит ID журнала, раздела, выпуска или ролей.
 
-Базовый URL строится через dispatcher OJS и путь текущего контекста; формат:
+## Workspace API
+
+База:
+
+```text
+/index.php/{journal}/api/v1/pdf-metadata/workspace
+```
+
+Маршруты:
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/workspace` | состояние workspace, locales, sections, author groups |
+| POST | `/workspace/upload` | загрузить полный PDF выпуска |
+| POST | `/workspace/extract` | извлечь диапазон startPage/endPage |
+| POST | `/workspace/save` | сохранить проверенный OJS draft |
+| POST | `/workspace/remove` | удалить один draft |
+| POST | `/workspace/clear` | удалить PDF и drafts текущего workspace |
+| GET | `/workspace/export` | экспортировать review JSON |
+
+Workspace идентифицируется комбинацией:
+
+- contextId;
+- userId;
+- session token.
+
+Данные хранятся в приватном `pdf_metadata.temp_dir`, а не в web root.
+
+## Review draft
+
+Черновик хранит:
+
+```text
+id
+startPage
+endPage
+locale
+publication
+authors[]
+unassignedAffiliations[]
+readyForOjs
+reviewedAt
+```
+
+`publication` использует имена полей OJS 3.5 там, где это возможно: `sectionId`, `pages`, `title`, `subtitle`, `abstract`, `keywords`, `citationsRaw`, DOI candidate.
+
+Авторы и аффилиации сохраняются отдельными структурами, чтобы следующий этап мог создавать реальные OJS entities через repositories и validators.
+
+## Извлечение диапазона
+
+`PdfExtractor::extractRange()`:
+
+1. проверяет PDF через `pdfinfo`;
+2. проверяет число страниц и шифрование;
+3. запускает `pdftotext -f start -l end`;
+4. передаёт текст в `MetadataParser`;
+5. возвращает suggestions + text + warnings.
+
+Для полного выпуска XMP/Info документа **не используются как article metadata**, поскольку обычно описывают выпуск целиком.
+
+## Безопасность
+
+- backend roles: manager / sub-editor;
+- cookie session only;
+- CSRF для POST;
+- private `temp_dir`;
+- PDF signature `%PDF-`;
+- максимальный issue PDF: 150 MiB;
+- максимум 5000 страниц документа;
+- максимум 80 страниц одной статьи;
+- максимум 200 drafts;
+- Poppler без shell;
+- `prlimit`, timeout и ограничение stdout;
+- JSON-файлы workspace записываются атомарно через temporary file + rename;
+- workspace PDF проверяется SHA-256 перед последующими операциями.
+
+## Existing submission API
+
+Совместимый API:
 
 ```text
 /index.php/{journal}/api/v1/pdf-metadata/{submissionId}/publications/{publicationId}
 ```
 
-| Метод | Суффикс | Действие |
-|---|---|---|
-| GET | пустой | Файлы, текущие значения, языки, группы авторов |
-| POST | `/extract` | `{ "fileId": 123 }` → предложения, warnings, текст, current, ticket |
-| POST | `/apply` | Проверка ticket и запись только явных fields/authors |
+- GET — current/files/locales/groups;
+- POST `/extract` — suggestions + ticket;
+- POST `/apply` — явное применение выбранных полей.
 
-Пример тела `/apply`:
+Этот путь использует штатные OJS repositories/validators, HMAC ticket, fingerprint текущих metadata и повторную проверку PDF перед записью.
 
-```json
-{
-  "ticket": "VALUE_FROM_EXTRACT",
-  "locale": "ru",
-  "fields": {"title": "Проверенное название", "keywords": ["журнал", "метаданные"]},
-  "authors": [{"action": "affiliations", "id": 42, "affiliations": ["Проверенная организация"]}]
-}
+## Следующий этап
+
+Планируемый этап после 1.0.1:
+
+```text
+review draft
+→ create OJS submission/publication
+→ create authors/affiliations
+→ assign issue/section/pages
+→ create article PDF galley from page range
+→ final editor review
 ```
 
-Операции авторов: `add` (givenName, familyName, email, userGroupId, affiliations), `update` (id, имена, email, affiliations), `affiliations` (id, affiliations). Имена/организации сохраняются на основном языке submission. Удаления автора нет. Пропуск автора — отсутствие операции. Неизвестные поля, чужие ID и группы, пустые значения и недопустимые локали отклоняются. Пустое поле нельзя использовать для очистки: для этого есть штатные формы OJS.
-
-Ответы: 200; 403 при отсутствии прав/CSRF; 409 при устаревшем ticket, изменении данных, существующем DOI; 413 при большом запросе; 422 при ошибке данных/PDF; 429 при занятом извлечении; 503 при отсутствии настройки/инструментов. Политики OJS могут вернуть собственную структуру ошибки до входа в контроллер. Ответы плагина содержат `Cache-Control: no-store`.
-
-## Безопасность
-
-Сначала выполняются `has.user`, `has.context`, роли менеджера/редактора и штатные `ContextAccessPolicy`, `PublicationWritePolicy`. Дополнительно на каждой операции проверяются совпадение контекста и submission, принадлежность publication, последняя версия, статус черновика и `canEditPublication`. Плагин работает только с сессией браузера; API token/Authorization отклоняются. POST требует точного `X-CSRF-Token` текущей сессии независимо от поведения общего middleware.
-
-Клиент передаёт только ID файла. Файл повторно загружается через `Repo::submissionFile()` и `app('file')->fs`, проверяются его submission и стадия, MIME, размер. Для Poppler создаётся отдельный случайный каталог 0700 и файл 0600. Исходный файл не меняется. Копия удаляется в `finally`. При аварийном завершении PHP могут остаться временные каталоги: администратор должен очищать только старые `pdfmd-*` внутри выделенного каталога после проверки отсутствия активной обработки. Каталог должен лежать вне web root и быть закрыт для других пользователей ОС.
-
-Poppler запускается через Symfony Process с массивом аргументов, без shell. Исполняемые пути приходят только из конфигурации сервера. `prlimit` и лимиты времени/вывода ограничивают процесс. Это ограничение ресурсов, а не полноценная песочница для уязвимого native parser: обновляйте Poppler; для недоверенных массовых загрузок запускайте PHP/Poppler в отдельном контейнере с запретом сети и минимальными файловыми правами. Никаких сетевых вызовов извлечения в коде нет.
-
-XMP с DOCTYPE/ENTITY не разбирается; DOM использует `LIBXML_NONET`, без DTDLOAD/NOENT. Все значения в Vue выводятся текстовыми узлами/полями, без `innerHTML`. Сохраняемый abstract очищается от разметки и HTML-экранируется. SQL с пользовательской конкатенацией отсутствует.
-
-Ticket подписан HMAC-SHA256 отдельным серверным секретом и действует 15 минут. Он связан с пользователем, сессией, журналом, submission и publication, содержит отпечаток метаданных и SHA-256 PDF. Изменяемый пользователем текст предложений не подписывается: редактор вправе исправлять его, а запись ограничена allowlist и валидацией OJS. Ticket не заменяет авторизацию.
-
-## Запись и конкуренция
-
-Перед применением ещё раз проверяются исходный PDF и его хеш. В транзакции блокируются строки submission и publication, объекты перечитываются, проверяются права/статус и отпечаток. Сохраняются данные через `Repo::publication()`, `Repo::author()`, `Repo::affiliation()`, `Repo::doi()` с их validators. Аффилиации нового автора валидируются после получения authorId внутри той же транзакции; ошибка приводит к rollback. Существующие авторы, их локали, ORCID, роли и организации сохраняются.
-
-Основной отпечаток включает title/abstract/keywords во всех локалях, материализованный citationsRaw (в 3.5 это Stringable), авторов/организации, DOI и dateModified. Это защищает от сохранения по старому просмотру. Повторный запрос после добавления авторов получает конфликт вместо дублей.
-
-После commit отправляется штатное событие `PKP\observers\events\MetadataChanged`. Изменения publication фиксируются штатным event log OJS; дополнительно лог плагина содержит ID и названия изменённых полей, без текста статьи/email/PDF. Сбой стороннего обработчика события после commit может дать 500 уже после записи: при таком ответе перечитайте значения перед повтором.
-
-Плагин не меняет все прочие пути записи ядра. Абсолютная защита от одновременно открытой штатной формы или стороннего плагина, сохраняющего автора без согласованной блокировки, не заявляется. Нужен организационный запрет параллельного редактирования одного материала; нагрузочные проверки на выбранной БД перечислены в TESTING.md. Сторонние hooks с внешними побочными эффектами также не откатываются транзакцией БД.
-
-## Расширение извлечения
-
-`PdfExtractor` возвращает единый контракт: `fields[key] = {value, source, confidence}`, `warnings`, `text`. Чтобы добавить локальный GROBID/OCR, замените или расширьте этот сервис, сохранив контракт, серверный выбор endpoint, лимиты, изоляцию и запрет автоматической записи. Не передавайте клиентский URL или путь процессу и не вводите скрытую отправку PDF внешнему API. В поставке GROBID/OCR не реализованы; fallback — встроенные данные/текст/ручная проверка.
+Создание и публикация должны оставаться отдельными действиями.
