@@ -44,7 +44,12 @@ class PdfMetadataPlugin extends GenericPlugin
                 'busy', 'saved', 'review', 'empty', 'reload', 'source', 'confidence', 'authorHelp',
                 'affiliationHelp', 'error', 'warning', 'text', 'noText', 'partial', 'unavailable',
                 'invalidPdf', 'limit', 'expired', 'conflict', 'forbidden', 'validation', 'doiExists',
-                'configuration', 'selectFields'] as $key) {
+                'configuration', 'selectFields', 'issueWorkspace', 'issueWorkspaceDescription', 'openWorkspace',
+                'uploadIssue', 'issuePdf', 'documentPages', 'startPage', 'endPage', 'extractRange', 'reviewDraft',
+                'section', 'pages', 'subtitle', 'preferredPublicName', 'orcid', 'country', 'url', 'userGroup',
+                'saveReview', 'reviewedArticles', 'ready', 'notReady', 'edit', 'remove', 'exportJson', 'clearWorkspace',
+                'confirmClear', 'unassignedAffiliations', 'addReviewAuthor', 'close', 'uploadHelp', 'workspaceEmpty',
+                'rangeHelp', 'rawText', 'issueUploaded', 'articleSaved', 'schemaNote', 'status'] as $key) {
                 $labels[$key] = __('plugins.generic.pdfMetadata.' . $key);
             }
             $manager->addJavaScript('pdfMetadataConfig', 'window.pdfMetadataConfig = ' . json_encode([

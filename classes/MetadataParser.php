@@ -24,12 +24,15 @@ class MetadataParser
             }
         }
         $title = $xml['title'] ?? $pdf['Title'] ?? '';
+        $chosenTitle = '';
         if ($title && !preg_match('/^(?:untitled|document\d*|Microsoft Word|без названия)/iu', $title)) {
-            $put('title', mb_substr($title, 0, 1000), isset($xml['title']) ? 'xmp' : 'pdf-info', 'medium');
+            $chosenTitle = mb_substr($title, 0, 1000);
+            $put('title', $chosenTitle, isset($xml['title']) ? 'xmp' : 'pdf-info', 'medium');
         } else {
             foreach (preg_split('/\R/u', mb_substr($front, 0, 3000)) as $line) {
                 $line = trim($line);
                 if (mb_strlen($line) >= 20 && mb_strlen($line) <= 300 && !preg_match('/(?:https?:|doi|issn|@|copyright|©)/iu', $line)) {
+                    $chosenTitle = $line;
                     $put('title', $line, 'first-lines', 'low');
                     break;
                 }
@@ -50,17 +53,71 @@ class MetadataParser
             $put('doi', rtrim($m[0], '.,;:'), 'identifier-or-front', 'low');
         }
         $authors = $xml['creators'] ?? [];
+        $authorSource = 'xmp-or-pdf-info';
         if (!$authors && !empty($pdf['Author'])) {
-            // Commas may separate surname/given name. Never split them automatically.
+            // Semicolons are unambiguous enough as separators. Do not interpret comma as surname/given name.
             $authors = preg_split('/\h*;\h*/u', $pdf['Author']);
         }
-        $put('authors', array_map(fn ($name) => ['name' => mb_substr($name, 0, 500), 'givenName' => '', 'familyName' => '', 'email' => ''], array_slice($authors, 0, 40)), 'xmp-or-pdf-info', 'low');
+        if (!$authors) {
+            $authors = $this->authorsFromFront($front, $chosenTitle);
+            $authorSource = 'first-lines';
+        }
+        $put('authors', array_map(fn ($name) => ['name' => mb_substr($name, 0, 500), 'givenName' => '', 'familyName' => '', 'email' => ''], array_slice($authors, 0, 40)), $authorSource, 'low');
         preg_match_all('/^.*(?:university|institute|academy|университет|институт|академи).*/miu', mb_substr($front, 0, 6000), $aff);
         $put('affiliations', array_slice(array_values(array_unique(array_filter(array_map('trim', $aff[0])))), 0, 20), 'first-lines', 'low');
         if (preg_match('/^\h*(?:References|Bibliography|Литература|Список литературы)\h*\n(.+)$/misu', $text, $m)) {
             $put('references', trim(mb_substr($m[1], 0, 100000)), 'heading', 'low');
         }
         return ['fields' => $fields, 'warnings' => mb_strlen(trim($text)) < 100 ? ['noText'] : [], 'text' => mb_substr($text, 0, 30000)];
+    }
+
+    /**
+     * Suggest author display names from lines immediately following the detected title.
+     * This is intentionally conservative and never guesses given/family-name ordering.
+     */
+    private function authorsFromFront(string $front, string $title): array
+    {
+        $lines = array_values(array_filter(array_map('trim', preg_split('/\R/u', mb_substr($front, 0, 4000))), fn ($v) => $v !== ''));
+        if (!$lines) { return []; }
+        $start = 0;
+        if ($title !== '') {
+            foreach ($lines as $i => $line) {
+                if ($line === $title || mb_stripos($line, $title) !== false || mb_stripos($title, $line) !== false) {
+                    $start = $i + 1;
+                    break;
+                }
+            }
+        }
+        $candidates = [];
+        for ($i = $start; $i < min(count($lines), $start + 6); $i++) {
+            $line = trim($lines[$i]);
+            if ($line === '' || mb_strlen($line) > 500) { continue; }
+            if (preg_match('/^(?:Abstract|Аннотация|Резюме|Keywords?|Ключевые слова|Введение|Introduction|УДК|UDC)\b/iu', $line)) { break; }
+            if (preg_match('/(?:university|institute|academy|department|faculty|университет|институт|академи|кафедр|факультет|https?:|www\.|@|doi\b|issn\b)/iu', $line)) {
+                if ($candidates) { break; }
+                continue;
+            }
+            // Strong author-line cues: explicit separators or initials. Otherwise allow a short human-name-like line.
+            $looksLikeName = preg_match('/[;,]/u', $line)
+                || preg_match('/\b\p{L}[.]\s*\p{L}[.]|\b\p{Lu}\p{Ll}+\s+\p{Lu}\p{Ll}+/u', $line);
+            if (!$looksLikeName) { continue; }
+            $parts = preg_split('/\s*;\s*/u', $line);
+            if (count($parts) === 1 && substr_count($line, ',') >= 1) {
+                $commaParts = array_values(array_filter(array_map('trim', preg_split('/\s*,\s*/u', $line))));
+                $allNameLike = count($commaParts) <= 12;
+                foreach ($commaParts as $part) {
+                    if (!preg_match('/^\p{L}[\p{L}\'’.-]*(?:\s+[\p{L}.\'’\-]+){1,5}$/u', $part)) { $allNameLike = false; break; }
+                }
+                if ($allNameLike) { $parts = $commaParts; }
+            }
+            foreach ($parts as $part) {
+                $part = trim($part, " \t\n\r\0\x0B,;");
+                if ($part !== '' && mb_strlen($part) <= 200) { $candidates[] = $part; }
+            }
+            // Usually the author block is one or two lines. Stop before consuming affiliations/body.
+            if (count($candidates) >= 1 && $i >= $start + 1) { break; }
+        }
+        return array_values(array_unique($candidates));
     }
 
     private function clean(string $text): string
