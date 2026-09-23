@@ -39,6 +39,21 @@ class IssueWorkspace
         return ['document' => is_array($meta) ? $meta : null, 'articles' => array_values($articles)];
     }
 
+    /** Serialize the complete read/modify/write operation, including upload/extract. */
+    public function synchronize(callable $action): mixed
+    {
+        // Outside the workspace directory so clear() cannot replace the lock inode.
+        $handle = fopen($this->dir . '.lock', 'c');
+        if (!$handle) { throw new Failure('configuration', 503); }
+        try {
+            chmod($this->dir . '.lock', 0600);
+            if (!flock($handle, LOCK_EX | LOCK_NB)) { throw new Failure('busy', 429); }
+            return $action();
+        } finally {
+            fclose($handle);
+        }
+    }
+
     public function upload(UploadedFile $file, PdfExtractor $extractor): array
     {
         if (!$file->isValid()) { throw new Failure('invalidPdf'); }
@@ -65,7 +80,6 @@ class IssueWorkspace
             fclose($out); $out = null;
 
             $info = $extractor->inspectDocument($tmp, self::MAX_ISSUE_BYTES);
-            if (is_file($this->pdf)) { unlink($this->pdf); }
             if (!rename($tmp, $this->pdf)) { throw new Failure('configuration', 503); }
             chmod($this->pdf, 0600);
             $meta = [
@@ -206,7 +220,7 @@ class IssueWorkspace
         if (!$state['document']) { throw new Failure('empty', 404); }
         return [
             'schema' => 'OJS-3.5-review-draft',
-            'pluginVersion' => '1.0.1',
+            'pluginVersion' => '1.0.1.1',
             'document' => $state['document'],
             'articles' => $state['articles'],
         ];
@@ -247,6 +261,7 @@ class IssueWorkspace
         $this->ensureDirectory();
         $tmp = $path . '.tmp-' . bin2hex(random_bytes(6));
         $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
+        if (strlen($json) > 10485760) { throw new Failure('limit', 413); }
         if (file_put_contents($tmp, $json, LOCK_EX) === false) { throw new Failure('configuration', 503); }
         chmod($tmp, 0600);
         if (!rename($tmp, $path)) { @unlink($tmp); throw new Failure('configuration', 503); }
@@ -255,7 +270,7 @@ class IssueWorkspace
 
     private function localized(mixed $value, string $locale): mixed
     {
-        return is_array($value) && array_key_exists($locale, $value) ? $value[$locale] : $value;
+        return is_array($value) ? ($value[$locale] ?? '') : $value;
     }
 
     private function terms(mixed $value, int $max): array

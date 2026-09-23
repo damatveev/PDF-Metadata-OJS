@@ -57,7 +57,7 @@ msgstr "References"
 msgid "plugins.generic.pdfMetadata.authors"
 msgstr "Authors"
 msgid "plugins.generic.pdfMetadata.authorHelp"
-msgstr "One author per line: Given name | Family name | email | Affiliation. Separate affiliations with semicolons."
+msgstr "Names are not split automatically. Choose an existing author or create one, then enter given name, family name and email. Author data is saved in the submission's primary language. Existing authors are never removed."
 msgid "plugins.generic.pdfMetadata.saveReview"
 msgstr "Save for review"
 msgid "plugins.generic.pdfMetadata.articleSaved"
@@ -100,3 +100,120 @@ msgid "plugins.generic.pdfMetadata.configuration"
 msgstr "The plugin private temporary directory must be configured."
 msgid "plugins.generic.pdfMetadata.selectFields"
 msgstr "Select data to save."
+
+msgid "plugins.generic.pdfMetadata.load"
+msgstr "Open metadata assistant"
+
+msgid "plugins.generic.pdfMetadata.extract"
+msgstr "Extract suggestions"
+
+msgid "plugins.generic.pdfMetadata.apply"
+msgstr "Save selected changes"
+
+msgid "plugins.generic.pdfMetadata.file"
+msgstr "Submission PDF"
+
+msgid "plugins.generic.pdfMetadata.current"
+msgstr "Current values"
+
+msgid "plugins.generic.pdfMetadata.proposed"
+msgstr "Proposed value — editable"
+
+msgid "plugins.generic.pdfMetadata.select"
+msgstr "Replace this field with the proposed value"
+
+msgid "plugins.generic.pdfMetadata.affiliations"
+msgstr "Add affiliations only — one institution per line"
+
+msgid "plugins.generic.pdfMetadata.givenName"
+msgstr "Given name"
+
+msgid "plugins.generic.pdfMetadata.familyName"
+msgstr "Family name"
+
+msgid "plugins.generic.pdfMetadata.email"
+msgstr "Email (required by OJS)"
+
+msgid "plugins.generic.pdfMetadata.addAuthor"
+msgstr "Add a mapping row"
+
+msgid "plugins.generic.pdfMetadata.skip"
+msgstr "Skip — do not change this author"
+
+msgid "plugins.generic.pdfMetadata.newAuthor"
+msgstr "Create a new author"
+
+msgid "plugins.generic.pdfMetadata.mapping"
+msgstr "Match to an existing author or create a new one"
+
+msgid "plugins.generic.pdfMetadata.group"
+msgstr "Contributor role"
+
+msgid "plugins.generic.pdfMetadata.saved"
+msgstr "Selected changes saved. Close and reopen the workflow to refresh the other forms."
+
+msgid "plugins.generic.pdfMetadata.review"
+msgstr "These are suggestions. Check the article language, author names, email addresses and DOI carefully. No field is selected by default. References replace the entire reference list."
+
+msgid "plugins.generic.pdfMetadata.reload"
+msgstr "Reload"
+
+msgid "plugins.generic.pdfMetadata.source"
+msgstr "Source"
+
+msgid "plugins.generic.pdfMetadata.confidence"
+msgstr "Heuristic confidence (not a probability)"
+
+msgid "plugins.generic.pdfMetadata.affiliationHelp"
+msgstr "Detected institutions are listed below. Copy only the matching institutions into each author's row. New affiliations are appended; existing affiliations and ROR records are preserved."
+
+msgid "plugins.generic.pdfMetadata.warning"
+msgstr "Check this result"
+
+msgid "plugins.generic.pdfMetadata.text"
+msgstr "Extracted text for manual verification (first 30,000 characters)"
+
+msgid "plugins.generic.pdfMetadata.issueAuthorHelp"
+msgstr "One author per line: given name | family name | email | affiliation. Separate multiple affiliations with semicolons."
+
+msgid "plugins.generic.pdfMetadata.subtitle"
+msgstr "Subtitle"
+
+msgid "plugins.generic.pdfMetadata.preferredPublicName"
+msgstr "Public name"
+
+msgid "plugins.generic.pdfMetadata.orcid"
+msgstr "ORCID"
+
+msgid "plugins.generic.pdfMetadata.country"
+msgstr "Country"
+
+msgid "plugins.generic.pdfMetadata.url"
+msgstr "Website"
+
+msgid "plugins.generic.pdfMetadata.userGroup"
+msgstr "Author role"
+
+msgid "plugins.generic.pdfMetadata.edit"
+msgstr "Edit"
+
+msgid "plugins.generic.pdfMetadata.clearWorkspace"
+msgstr "Clear workspace"
+
+msgid "plugins.generic.pdfMetadata.confirmClear"
+msgstr "Delete the uploaded issue PDF and all its saved drafts? Export your JSON first if needed."
+
+msgid "plugins.generic.pdfMetadata.unassignedAffiliations"
+msgstr "Suggested affiliations: assign to the appropriate authors"
+
+msgid "plugins.generic.pdfMetadata.addReviewAuthor"
+msgstr "Add author"
+
+msgid "plugins.generic.pdfMetadata.rangeHelp"
+msgstr "Use physical PDF page numbers, not printed page numbers."
+
+msgid "plugins.generic.pdfMetadata.rawText"
+msgstr "Extracted text"
+
+msgid "plugins.generic.pdfMetadata.schemaNote"
+msgstr "Review drafts are not published OJS submissions."

@@ -7,6 +7,7 @@ use APP\template\TemplateManager;
 use APP\plugins\generic\pdfMetadata\classes\MetadataController;
 use PKP\plugins\GenericPlugin;
 use PKP\plugins\Hook;
+use PKP\security\Role;
 
 class PdfMetadataPlugin extends GenericPlugin
 {
@@ -31,10 +32,16 @@ class PdfMetadataPlugin extends GenericPlugin
             if (!$request->getContext() || !$request->getUser()) {
                 return Hook::CONTINUE;
             }
+            if (!$request->getUser()->hasRole([Role::ROLE_ID_MANAGER, Role::ROLE_ID_SUB_EDITOR], $request->getContext()->getId())) {
+                return Hook::CONTINUE;
+            }
             $manager = $args[0];
             $base = $request->getBaseUrl() . '/' . $this->getPluginPath();
             $manager->addJavaScript('pdfMetadata', $base . '/js/pdfMetadata.js', [
                 'contexts' => ['backend'], 'priority' => TemplateManager::STYLE_SEQUENCE_LATE + 2,
+            ]);
+            $manager->addJavaScript('submissionMetadata', $base . '/js/submissionMetadata.js', [
+                'contexts' => ['backend'], 'priority' => TemplateManager::STYLE_SEQUENCE_LATE + 3,
             ]);
             $manager->addStyleSheet('pdfMetadata', $base . '/styles/pdfMetadata.css', ['contexts' => ['backend']]);
             $labels = [];
@@ -49,7 +56,7 @@ class PdfMetadataPlugin extends GenericPlugin
                 'section', 'pages', 'subtitle', 'preferredPublicName', 'orcid', 'country', 'url', 'userGroup',
                 'saveReview', 'reviewedArticles', 'ready', 'notReady', 'edit', 'remove', 'exportJson', 'clearWorkspace',
                 'confirmClear', 'unassignedAffiliations', 'addReviewAuthor', 'close', 'uploadHelp', 'workspaceEmpty',
-                'rangeHelp', 'rawText', 'issueUploaded', 'articleSaved', 'schemaNote', 'status'] as $key) {
+                'rangeHelp', 'rawText', 'issueUploaded', 'articleSaved', 'schemaNote', 'status', 'issueAuthorHelp'] as $key) {
                 $labels[$key] = __('plugins.generic.pdfMetadata.' . $key);
             }
             $manager->addJavaScript('pdfMetadataConfig', 'window.pdfMetadataConfig = ' . json_encode([

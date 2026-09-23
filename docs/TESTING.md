@@ -1,5 +1,18 @@
 # Тестирование и приёмка
 
+## Проверки 1.0.1.1 (24 сентября 2026)
+
+```sh
+php tests/adapter.php
+php tests/workspace.php
+node tests/ui.cjs
+python3 scripts/package.py
+```
+
+Для PHP необходимы mbstring и DOM. Автономные проверки: 36 parser/ticket assertions, 15 repository-double assertions, 17 filesystem workspace assertions. Node исполняет оба UI с Vue/DOM/fetch doubles, включая запуск до DOMContentLoaded, сохранение сообщения об ошибке, newline keywords, edit/clear и CSRF. Сборщик проверяет ключи локализации, структуру и побайтовое содержимое архивов.
+
+Это не испытание запущенного OJS: Linux Poppler/prlimit, настоящая БД, роли, маршруты и браузер workflow должны пройти матрицу ниже на staging перед production.
+
 ## Минимальная локальная проверка
 
 Из корня плагина:

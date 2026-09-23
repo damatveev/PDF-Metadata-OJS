@@ -57,7 +57,7 @@ msgstr "Список литературы"
 msgid "plugins.generic.pdfMetadata.authors"
 msgstr "Авторы"
 msgid "plugins.generic.pdfMetadata.authorHelp"
-msgstr "Один автор на строке: Имя | Фамилия | email | Организация. Организации можно Разделять точкой с запятой."
+msgstr "Имя и фамилия не разделяются автоматически. Выберите существующего автора или создание нового, затем укажите имя, фамилию и почту. Данные авторов сохраняются на основном языке материала. Существующие авторы не удаляются."
 msgid "plugins.generic.pdfMetadata.saveReview"
 msgstr "Сохранить на проверку"
 msgid "plugins.generic.pdfMetadata.articleSaved"
@@ -100,3 +100,120 @@ msgid "plugins.generic.pdfMetadata.configuration"
 msgstr "Требуется настройка закрытого временного каталога плагина."
 msgid "plugins.generic.pdfMetadata.selectFields"
 msgstr "Выберите данные для сохранения."
+
+msgid "plugins.generic.pdfMetadata.load"
+msgstr "Открыть помощник метаданных"
+
+msgid "plugins.generic.pdfMetadata.extract"
+msgstr "Извлечь метаданные"
+
+msgid "plugins.generic.pdfMetadata.apply"
+msgstr "Сохранить выбранные изменения"
+
+msgid "plugins.generic.pdfMetadata.file"
+msgstr "PDF материала"
+
+msgid "plugins.generic.pdfMetadata.current"
+msgstr "Текущие значения"
+
+msgid "plugins.generic.pdfMetadata.proposed"
+msgstr "Предлагаемое значение — можно исправить"
+
+msgid "plugins.generic.pdfMetadata.select"
+msgstr "Заменить это поле предлагаемым значением"
+
+msgid "plugins.generic.pdfMetadata.affiliations"
+msgstr "Только добавление аффилиаций — по одной организации на строке"
+
+msgid "plugins.generic.pdfMetadata.givenName"
+msgstr "Имя и отчество"
+
+msgid "plugins.generic.pdfMetadata.familyName"
+msgstr "Фамилия"
+
+msgid "plugins.generic.pdfMetadata.email"
+msgstr "Электронная почта (обязательна в OJS)"
+
+msgid "plugins.generic.pdfMetadata.addAuthor"
+msgstr "Добавить строку сопоставления"
+
+msgid "plugins.generic.pdfMetadata.skip"
+msgstr "Пропустить — не изменять автора"
+
+msgid "plugins.generic.pdfMetadata.newAuthor"
+msgstr "Создать нового автора"
+
+msgid "plugins.generic.pdfMetadata.mapping"
+msgstr "Сопоставить с существующим автором или создать нового"
+
+msgid "plugins.generic.pdfMetadata.group"
+msgstr "Роль участника публикации"
+
+msgid "plugins.generic.pdfMetadata.saved"
+msgstr "Выбранные изменения сохранены. Закройте и снова откройте рабочий процесс, чтобы обновить остальные формы."
+
+msgid "plugins.generic.pdfMetadata.review"
+msgstr "Это предположения. Проверьте язык статьи, имена, адреса авторов и DOI. По умолчанию ни одно поле не выбрано. Список литературы заменяется целиком."
+
+msgid "plugins.generic.pdfMetadata.reload"
+msgstr "Обновить"
+
+msgid "plugins.generic.pdfMetadata.source"
+msgstr "Источник"
+
+msgid "plugins.generic.pdfMetadata.confidence"
+msgstr "Эвристическая уверенность (не вероятность)"
+
+msgid "plugins.generic.pdfMetadata.affiliationHelp"
+msgstr "Ниже перечислены найденные организации. Скопируйте подходящие в строку соответствующего автора. Аффилиации добавляются; существующие организации и записи ROR сохраняются."
+
+msgid "plugins.generic.pdfMetadata.warning"
+msgstr "Проверьте результат"
+
+msgid "plugins.generic.pdfMetadata.text"
+msgstr "Извлечённый текст для проверки (первые 30 000 символов)"
+
+msgid "plugins.generic.pdfMetadata.issueAuthorHelp"
+msgstr "Каждый автор с новой строки: имя | фамилия | email | организация. Несколько организаций разделяйте точкой с запятой."
+
+msgid "plugins.generic.pdfMetadata.subtitle"
+msgstr "Подзаголовок"
+
+msgid "plugins.generic.pdfMetadata.preferredPublicName"
+msgstr "Публикуемое имя"
+
+msgid "plugins.generic.pdfMetadata.orcid"
+msgstr "ORCID"
+
+msgid "plugins.generic.pdfMetadata.country"
+msgstr "Страна"
+
+msgid "plugins.generic.pdfMetadata.url"
+msgstr "Сайт"
+
+msgid "plugins.generic.pdfMetadata.userGroup"
+msgstr "Роль автора"
+
+msgid "plugins.generic.pdfMetadata.edit"
+msgstr "Редактировать"
+
+msgid "plugins.generic.pdfMetadata.clearWorkspace"
+msgstr "Очистить рабочее пространство"
+
+msgid "plugins.generic.pdfMetadata.confirmClear"
+msgstr "Удалить загруженный PDF выпуска и все сохранённые черновики? При необходимости сначала экспортируйте JSON."
+
+msgid "plugins.generic.pdfMetadata.unassignedAffiliations"
+msgstr "Предлагаемые организации: укажите их для соответствующих авторов"
+
+msgid "plugins.generic.pdfMetadata.addReviewAuthor"
+msgstr "Добавить автора"
+
+msgid "plugins.generic.pdfMetadata.rangeHelp"
+msgstr "Используйте номера страниц PDF, а не печатную нумерацию."
+
+msgid "plugins.generic.pdfMetadata.rawText"
+msgstr "Извлечённый текст"
+
+msgid "plugins.generic.pdfMetadata.schemaNote"
+msgstr "Черновики разметки не являются опубликованными материалами OJS."
