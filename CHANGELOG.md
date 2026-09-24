@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.1.4 — 2026-09-24
+
+- Исправлена авторизация standalone workspace по штатной схеме OJS 3.5: `has.user` + `has.context` + `has.roles`.
+- Добавлены `UserRolesRequiredPolicy`, `ContextRequiredPolicy` и `ContextAccessPolicy`, как в core API OJS 3.5.
+- Доступ к workspace разрешён site administrator, journal manager и sub-editor.
+- Site administrator теперь получает интерфейс workspace в backend журнала.
+- Повышен z-index launcher и добавлен явный `pointer-events`, чтобы кнопка «Разметить PDF выпуска» не перекрывалась backend-слоями OJS.
+
 ## 1.0.1.3 — 2026-09-24
 
 - Добавлен fallback на Ghostscript, если `pdfinfo`/`pdftotext` (Poppler) недоступны на сервере.
