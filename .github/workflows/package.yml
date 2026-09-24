@@ -1,0 +1,45 @@
+name: Build plugin packages
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'dist/**'
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify JavaScript contracts
+        run: node tests/ui.cjs
+
+      - name: Verify PHP syntax
+        run: find . -name '*.php' -not -path './dist/*' -print0 | xargs -0 -n1 php -l
+
+      - name: Build deterministic packages
+        run: python3 scripts/package.py
+
+      - name: Commit distribution artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add dist/
+          if git diff --cached --quiet; then
+            echo "Distribution artifacts already up to date."
+            exit 0
+          fi
+          version="$(python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          print(ET.parse('version.xml').getroot().findtext('release'))
+          PY
+          )"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Build distribution artifacts for ${version}"
+          git push
