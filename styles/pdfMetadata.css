@@ -16,7 +16,7 @@
 .pdfmd-actions { margin-top: 1rem; }
 
 /* Standalone issue-PDF workspace (v1.0.1) */
-.pdfmd-workspace-launcher { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 900; border: 1px solid #225aa0; border-radius: 999px; background: #225aa0; color: #fff; padding: .7rem 1rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 18px rgba(0,0,0,.18); }
+.pdfmd-workspace-launcher { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999; pointer-events: auto; border: 1px solid #225aa0; border-radius: 999px; background: #225aa0; color: #fff; padding: .7rem 1rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 18px rgba(0,0,0,.18); }
 .pdfmd-workspace-backdrop { position: fixed; inset: 0; z-index: 10000; background: rgba(22,34,50,.58); overflow: auto; padding: 2rem; }
 .pdfmd-workspace-backdrop[hidden] { display: none !important; }
 .pdfmd-workspace { box-sizing: border-box; width: min(1180px, 100%); margin: 0 auto; border-radius: .45rem; background: #f5f7fa; color: #24334b; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
@@ -35,6 +35,7 @@
 .pdfmd-table th, .pdfmd-table td { padding: .65rem; border-bottom: 1px solid #d8dee7; text-align: left; vertical-align: top; }
 .pdfmd-table td:last-child { white-space: nowrap; }
 .pdfmd-modal-open { overflow: hidden; }
+.pdfmd-modal-open .pdfmd-workspace-launcher { visibility: hidden; }
 @media (max-width: 720px) {
   .pdfmd-workspace-backdrop { padding: 0; }
   .pdfmd-workspace { min-height: 100vh; border-radius: 0; }

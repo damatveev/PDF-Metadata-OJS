@@ -40,7 +40,11 @@ class PdfMetadataPlugin extends GenericPlugin
             if (!$request->getContext() || !$request->getUser()) {
                 return Hook::CONTINUE;
             }
-            if (!$request->getUser()->hasRole([Role::ROLE_ID_MANAGER, Role::ROLE_ID_SUB_EDITOR], $request->getContext()->getId())) {
+            $user = $request->getUser();
+            $contextId = $request->getContext()->getId();
+            $canUsePlugin = $user->hasRole([Role::ROLE_ID_MANAGER, Role::ROLE_ID_SUB_EDITOR], $contextId)
+                || $user->hasRole([Role::ROLE_ID_SITE_ADMIN], Application::SITE_CONTEXT_ID);
+            if (!$canUsePlugin) {
                 return Hook::CONTINUE;
             }
             $manager = $args[0];

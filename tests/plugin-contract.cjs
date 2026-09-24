@@ -28,4 +28,20 @@ assert(
   'locale registration is invoked before labels are resolved'
 );
 
-console.log('Plugin contract: OJS 3.5 API router signature and locale registration passed.');
+const controller = fs.readFileSync(__dirname + '/../classes/MetadataController.php', 'utf8');
+assert(
+  controller.includes("self::roleAuthorizer([Role::ROLE_ID_SITE_ADMIN, Role::ROLE_ID_MANAGER, Role::ROLE_ID_SUB_EDITOR])"),
+  'workspace API uses OJS 3.5 role middleware for site admin, manager and sub-editor'
+);
+assert(
+  controller.includes("new UserRolesRequiredPolicy($request)") &&
+  controller.includes("new ContextRequiredPolicy($request)") &&
+  controller.includes("new ContextAccessPolicy($request, $roleAssignments)"),
+  'workspace API mirrors OJS 3.5 context authorization stack'
+);
+assert(
+  plugin.includes("Role::ROLE_ID_SITE_ADMIN") && plugin.includes("Application::SITE_CONTEXT_ID"),
+  'site administrators receive the workspace UI'
+);
+
+console.log('Plugin contract: OJS 3.5 API router, authorization and locale registration passed.');
