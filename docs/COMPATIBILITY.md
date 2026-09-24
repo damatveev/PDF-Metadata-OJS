@@ -4,7 +4,7 @@
 
 Повторная сверка исходников 24 сентября 2026 для 1.0.1.1: OJS `769450f2d4048da1f5bcf7f9537f51f7c2c2234b` (3.5.0.5), lib/pkp `6acb1be2eb8bde98545de595c3975861e923561e`, UI `1a7a47504c4f8b78f423cdfd16c55c0fcf01caca`. Это проверка контрактов исходников, не результат запуска полного OJS.
 
-Целевая линия: **OJS 3.5.x**.
+Целевая линия: **OJS 3.5.x**, минимально **3.5.0-4** для custom plugin API endpoint.
 
 Версия, на которой сверялась интеграция при разработке 1.0.1: **OJS 3.5.0-5**.
 
@@ -37,6 +37,9 @@ Affiliation:
 Workspace 1.0.1 хранит review draft в этой логике, но до отдельной команды импорта не создаёт соответствующие DB entities.
 
 ## Проверенные интеграционные точки
+
+- `APIHandler::endpoints::plugin` с сигнатурой callback `(string $hookName, APIRouter $apiRouter)` для OJS 3.5.0-4+;
+- явная регистрация plugin locale path до разрешения display name/labels;
 
 - GenericPlugin registration;
 - plugin API controller registration;

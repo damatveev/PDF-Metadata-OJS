@@ -6,10 +6,11 @@
 php tests/adapter.php
 php tests/workspace.php
 node tests/ui.cjs
+node tests/plugin-contract.cjs
 python3 scripts/package.py
 ```
 
-Для PHP необходимы mbstring и DOM. Автономные проверки: 36 parser/ticket assertions, 15 repository-double assertions, 17 filesystem workspace assertions. Node исполняет оба UI с Vue/DOM/fetch doubles, включая запуск до DOMContentLoaded, сохранение сообщения об ошибке, newline keywords, edit/clear и CSRF. Сборщик проверяет ключи локализации, структуру и побайтовое содержимое архивов.
+Для PHP необходимы mbstring и DOM. Автономные проверки: 36 parser/ticket assertions, 15 repository-double assertions, 17 filesystem workspace assertions. Node проверяет также API/locale contract плагина и исполняет оба UI с Vue/DOM/fetch doubles, включая запуск до DOMContentLoaded, сохранение сообщения об ошибке, newline keywords, edit/clear и CSRF. Сборщик проверяет ключи локализации, структуру и побайтовое содержимое архивов.
 
 Это не испытание запущенного OJS: Linux Poppler/prlimit, настоящая БД, роли, маршруты и браузер workflow должны пройти матрицу ниже на staging перед production.
 
