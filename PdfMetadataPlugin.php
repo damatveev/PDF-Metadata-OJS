@@ -5,6 +5,8 @@ namespace APP\plugins\generic\pdfMetadata;
 use APP\core\Application;
 use APP\template\TemplateManager;
 use APP\plugins\generic\pdfMetadata\classes\MetadataController;
+use PKP\core\APIRouter;
+use PKP\facades\Locale;
 use PKP\plugins\GenericPlugin;
 use PKP\plugins\Hook;
 use PKP\security\Role;
@@ -16,6 +18,10 @@ class PdfMetadataPlugin extends GenericPlugin
         if (!parent::register($category, $path, $mainContextId)) {
             return false;
         }
+        // Register plugin locales explicitly. LazyLoadPlugin also does this, but
+        // doing it here makes translations available before any UI labels are resolved.
+        $this->ensureLocaleData();
+
         if (!$this->getEnabled($mainContextId)) {
             return true;
         }
@@ -23,11 +29,12 @@ class PdfMetadataPlugin extends GenericPlugin
         if (!preg_match('/^3\.5\./', $version)) {
             return false;
         }
-        Hook::add('APIHandler::endpoints::plugin', function ($hook, $args) {
-            $args[0]->registerPluginApiControllers([new MetadataController()]);
+        Hook::add('APIHandler::endpoints::plugin', function (string $hookName, APIRouter $apiRouter): bool {
+            $apiRouter->registerPluginApiControllers([new MetadataController()]);
             return Hook::CONTINUE;
         });
         Hook::add('TemplateManager::display', function ($hook, $args) {
+            $this->ensureLocaleData();
             $request = Application::get()->getRequest();
             if (!$request->getContext() || !$request->getUser()) {
                 return Hook::CONTINUE;
@@ -70,7 +77,25 @@ class PdfMetadataPlugin extends GenericPlugin
         return true;
     }
 
+    private function ensureLocaleData(): void
+    {
+        $path = __DIR__ . '/locale';
+        if (is_dir($path)) {
+            Locale::registerPath($path);
+        }
+    }
+
     public function getName() { return 'pdfmetadataplugin'; }
-    public function getDisplayName() { return __('plugins.generic.pdfMetadata.name'); }
-    public function getDescription() { return __('plugins.generic.pdfMetadata.description'); }
+
+    public function getDisplayName()
+    {
+        $this->ensureLocaleData();
+        return __('plugins.generic.pdfMetadata.name');
+    }
+
+    public function getDescription()
+    {
+        $this->ensureLocaleData();
+        return __('plugins.generic.pdfMetadata.description');
+    }
 }
