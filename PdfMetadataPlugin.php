@@ -26,7 +26,8 @@ class PdfMetadataPlugin extends GenericPlugin
             return true;
         }
         $version = Application::get()->getCurrentVersion()->getVersionString();
-        if (!preg_match('/^3\.5\./', $version)) {
+        $normalizedVersion = str_replace('-', '.', $version);
+        if (!preg_match('/^3\.5\./', $version) || version_compare($normalizedVersion, '3.5.0.4', '<')) {
             return false;
         }
         Hook::add('APIHandler::endpoints::plugin', function (string $hookName, APIRouter $apiRouter): bool {
