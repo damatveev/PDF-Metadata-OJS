@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.1.3 — 2026-09-24
+
+- Добавлен fallback на Ghostscript, если `pdfinfo`/`pdftotext` (Poppler) недоступны на сервере.
+- Ghostscript использует `txtwrite` для извлечения текста и `pdfpagecount` для определения числа страниц.
+- Poppler остаётся приоритетным backend, если оба его бинарника доступны.
+- Ghostscript запускается без shell, с `-dSAFER` и теми же ограничениями `prlimit`.
+- Добавлен contract-test выбора PDF backend.
+
 ## 1.0.1.2 — 2026-09-24
 
 - Исправлена регистрация custom API controller для OJS 3.5.0-4+: hook получает `APIRouter` напрямую, а не массив аргументов.

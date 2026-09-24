@@ -48,7 +48,8 @@ Workspace 1.0.1 хранит review draft в этой логике, но до о
 - author user groups;
 - publication/author/affiliation repositories и validators для legacy apply mode;
 - private file handling;
-- OJS session + CSRF.
+- OJS session + CSRF;
+- runtime fallback: Poppler при наличии обоих бинарников, иначе Ghostscript.
 
 ## Runtime
 
@@ -58,7 +59,7 @@ Workspace 1.0.1 хранит review draft в этой логике, но до о
 - `mbstring`;
 - DOM/libxml;
 - Linux;
-- Poppler;
+- Poppler (`pdfinfo` + `pdftotext`) или Ghostscript (`gs` с `txtwrite`);
 - `prlimit`.
 
 ## Не заявляется

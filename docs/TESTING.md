@@ -12,7 +12,7 @@ python3 scripts/package.py
 
 Для PHP необходимы mbstring и DOM. Автономные проверки: 36 parser/ticket assertions, 15 repository-double assertions, 17 filesystem workspace assertions. Node проверяет также API/locale contract плагина и исполняет оба UI с Vue/DOM/fetch doubles, включая запуск до DOMContentLoaded, сохранение сообщения об ошибке, newline keywords, edit/clear и CSRF. Сборщик проверяет ключи локализации, структуру и побайтовое содержимое архивов.
 
-Это не испытание запущенного OJS: Linux Poppler/prlimit, настоящая БД, роли, маршруты и браузер workflow должны пройти матрицу ниже на staging перед production.
+Это не испытание запущенного OJS: Linux Poppler или Ghostscript + prlimit, настоящая БД, роли, маршруты и браузер workflow должны пройти матрицу ниже на staging перед production.
 
 ## Минимальная локальная проверка
 
@@ -32,6 +32,7 @@ node --check js/pdfMetadata.js
 ```sh
 command -v pdfinfo
 command -v pdftotext
+command -v gs
 command -v prlimit
 php -m | grep -E 'mbstring|dom|libxml'
 ```
@@ -87,7 +88,7 @@ php -m | grep -E 'mbstring|dom|libxml'
 - locales;
 - plugin registry;
 - PHP-FPM user;
-- Poppler;
+- Poppler или Ghostscript;
 - browser backend.
 
 1.0.1 не тестирует и не выполняет автоматическое создание статей OJS из workspace — этой функции в версии нет.
